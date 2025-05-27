@@ -29,6 +29,8 @@ public class ClienteJpaController implements Serializable {
     }
     private EntityManagerFactory emf = Persistence.createEntityManagerFactory("com.mycompany_Fact_war_1.0-SNAPSHOTPU");
 
+   
+
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
