@@ -33,8 +33,10 @@ public class ChangePas extends HttpServlet {
             BufferedReader reader = request.getReader();
             JsonObject json = gson.fromJson(reader, JsonObject.class);
 
+            String npass = json.get("cNewPass").getAsString();
+            String pass = json.get("newPass").getAsString();
+            String pastpass = json.get("pastPass").getAsString();
             String log = json.get("log").getAsString();
-            String passCifrada = json.get("pass").getAsString();
          }
     }
 
