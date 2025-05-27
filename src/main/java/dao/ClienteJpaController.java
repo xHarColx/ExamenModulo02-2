@@ -12,8 +12,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import util.DESCipher;
+import util.SHA256Util;
 
 /**
  *
@@ -24,10 +27,13 @@ public class ClienteJpaController implements Serializable {
     public ClienteJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
-    private EntityManagerFactory emf = null;
+    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("com.mycompany_Fact_war_1.0-SNAPSHOTPU");
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
+    }
+
+    public ClienteJpaController() {
     }
 
     public void create(Cliente cliente) {
@@ -133,5 +139,63 @@ public class ClienteJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    public Cliente validarUsuario(Cliente u) {
+        EntityManager em = getEntityManager();
+        try {
+            Query q = em.createNamedQuery("Cliente.validar", Cliente.class);
+            q.setParameter("logiClie", u.getLogiClie());
+            q.setParameter("passClie", u.getPassClie());
+            return (Cliente) q.getSingleResult();
+        } catch (Exception ex) {
+            String mensaje = ex.getMessage();
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
+    public String cambiarClave(Cliente u, String nuevaClave) {
+        EntityManager em = getEntityManager();
+        try {
+            Cliente usuario = validarUsuario(u);
+            if (usuario != null) { // Verifica que el usuario exista
+                if (usuario.getPassClie().equals(u.getPassClie())) {
+                    usuario.setPassClie(nuevaClave);
+                    edit(usuario);
+                    return "Clave cambiada";
+                } else {
+                    return "Clave actual no válida";
+                }
+            } else {
+                return "Usuario no encontrado"; // Manejo de usuario no encontrado
+            }
+        } catch (Exception ex) {
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        ClienteJpaController vurDAO = new ClienteJpaController();
+        Cliente vur = vurDAO.validarUsuario(new Cliente("harol", "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4"));
+        String clave = "12345678";
+        String pass = "1234";
+        String contraCifrada = DESCipher.cifrar(pass, clave);
+        System.out.println("Contra cifrada: " + contraCifrada);
+        System.out.println("---------------------------");
+        String contraDescifrada = DESCipher.descifrar(contraCifrada, clave);
+        System.out.println("Contra descifrada: " + contraDescifrada);
+        System.out.println("---------------------------");
+        String contraSHA512 = SHA256Util.hash(contraDescifrada);
+        System.out.println("Contra usando SHA256: " + contraSHA512);
+
+        if (vur != null) {
+            System.out.println("PERSONA ENCONTRADA");
+        } else {
+            System.out.println("PERSONA NO ENCONTRADA");
+        }
+    }
+
 }
