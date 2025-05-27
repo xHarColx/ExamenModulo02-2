@@ -33,6 +33,7 @@ btnLogin.addEventListener("click", async (event) => {
 
         if (result.result === "ok") {
             setCookie("token", result.token, 7); // función definida aparte
+            setCookie("logi", result.logi, 7); // función definida aparte
             alert("Inicio de sesión exitoso.");
             window.location.href = "dist/pages/index.html";
         } else {

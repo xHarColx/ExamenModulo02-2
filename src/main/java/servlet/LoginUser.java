@@ -60,6 +60,7 @@ public class LoginUser extends HttpServlet {
                 String token = JwtUtil.generarToken(log);
                 jsonObject.addProperty("result", "ok");
                 jsonObject.addProperty("token", token);
+                jsonObject.addProperty("logi", usuario.getLogiClie());
                 jsonObject.addProperty("codiClie", usuario.getCodiClie());
                 jsonObject.addProperty("logiClie", usuario.getLogiClie());
                 jsonObject.addProperty("passClie", usuario.getPassClie());
